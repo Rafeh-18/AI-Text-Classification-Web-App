@@ -2,6 +2,8 @@
 
 A full-stack web application for classifying text into 22 categories using machine learning. Built with **FastAPI** + **React**, using a TF-IDF + Logistic Regression pipeline trained on IMDB and 20 Newsgroups datasets.
 
+> **The ML model is pre-trained and included in the repository** — no training step required.
+
 ---
 
 ## Tech Stack
@@ -21,74 +23,83 @@ A full-stack web application for classifying text into 22 categories using machi
 ```
 AI-Text-Classification-Web-App/
 ├── backend/
-│   ├── app/
-│   │   ├── database/
-│   │   │   └── database.py          # SQLAlchemy engine & session
-│   │   ├── ml/
-│   │   │   ├── data/                # Raw datasets (IMDB CSV)
-│   │   │   ├── models/              # Trained model + label mapping
-│   │   │   │   ├── text_classifier.joblib
-│   │   │   │   └── label_mapping.json
-│   │   │   ├── artifacts/           # Intermediate training outputs
-│   │   │   └── src/
-│   │   │       ├── preprocess.py    # Data loading & cleaning
-│   │   │       ├── train.py         # Model training pipeline
-│   │   │       └── predict.py       # Inference service (singleton)
-│   │   ├── models/
-│   │   │   └── user_model.py        # SQLAlchemy ORM models
-│   │   ├── routes/
-│   │   │   ├── auth_routes.py       # /auth endpoints
-│   │   │   └── predict_routes.py    # /predict endpoints
-│   │   ├── schemas/
-│   │   │   └── user_schema.py       # Pydantic request/response schemas
-│   │   ├── services/
-│   │   │   ├── auth_service.py      # Register, login, user lookup
-│   │   │   └── predict_service.py   # Prediction + history CRUD
-│   │   ├── utils/
-│   │   │   └── security.py          # JWT creation & verification
-│   │   ├── config.py                # Pydantic settings (reads .env)
-│   │   └── main.py                  # FastAPI app entry point
-│   └── tests/
-│       ├── conftest.py              # Fixtures & test DB setup
-│       ├── test_auth.py             # Auth endpoint tests
-│       └── test_predict.py          # Prediction endpoint tests
+│   ├── __init__.py
+│   └── app/
+│       ├── __init__.py
+│       ├── database/
+│       │   ├── app.db                   # SQLite database (auto-created)
+│       │   └── database.py              # SQLAlchemy engine & session
+│       ├── ml/
+│       │   ├── artifacts/
+│       │   │   ├── combined_dataset.csv # Merged training data
+│       │   │   ├── eda_distribution.png # Distribution plots
+│       │   │   └── label_mapping.csv    # Label encoder output
+│       │   ├── data/
+│       │   │   └── IMDB Dataset.csv     # Raw IMDB data
+│       │   ├── models/
+│       │   │   ├── text_classifier.joblib   # ✅ Pre-trained model
+│       │   │   ├── label_mapping.json       # ✅ Class label mapping
+│       │   │   └── training_metrics.json    # Accuracy & CV scores
+│       │   └── src/
+│       │       ├── preprocess.py        # Data loading & cleaning
+│       │       ├── train.py             # Model training pipeline
+│       │       └── predict.py           # Inference service (singleton)
+│       ├── models/
+│       │   └── user_model.py            # SQLAlchemy ORM models
+│       ├── routes/
+│       │   ├── auth_routes.py           # /auth endpoints
+│       │   └── predict_routes.py        # /predict endpoints
+│       ├── schemas/
+│       │   └── user_schema.py           # Pydantic request/response schemas
+│       ├── services/
+│       │   ├── auth_service.py          # Register, login, user lookup
+│       │   └── predict_service.py       # Prediction + history CRUD
+│       ├── utils/
+│       │   └── security.py              # JWT creation & verification
+│       ├── config.py                    # Pydantic settings (reads .env)
+│       └── main.py                      # FastAPI app entry point
 ├── frontend/
-│   ├── src/
-│   │   ├── components/              # Layout, ProtectedRoute, UI primitives
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── History.jsx
-│   │   │   └── Profile.jsx
-│   │   ├── services/
-│   │   │   └── api.js               # Axios instance + auth/predict API
-│   │   ├── store/
-│   │   │   └── authStore.js         # Zustand auth state
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── package.json
-├── .env                             # Environment variables (never commit)
+│   └── src/
+│       ├── components/                  # Layout, ProtectedRoute, UI primitives
+│       ├── pages/
+│       │   ├── Home.jsx
+│       │   ├── Login.jsx
+│       │   ├── Register.jsx
+│       │   ├── Dashboard.jsx
+│       │   ├── History.jsx
+│       │   └── Profile.jsx
+│       ├── services/
+│       │   └── api.js                   # Axios instance + API methods
+│       ├── store/
+│       │   └── authStore.js             # Zustand auth state
+│       ├── App.jsx
+│       └── main.jsx
+├── .env                                 # Local environment variables (never commit)
 ├── .env.example
 ├── .gitignore
+├── README.md
 └── requirements.txt
 ```
 
 ---
 
-## Setup
+## Quick Start
 
 ### Prerequisites
 
 - Python 3.10+
 - Node.js 18+
 
-### 1. Clone & create virtual environment
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/AI-Text-Classification-Web-App.git
+git clone https://github.com/Rafeh-18/AI-Text-Classification-Web-App.git
 cd AI-Text-Classification-Web-App
+```
+
+### 2. Create a virtual environment
+
+```bash
 python -m venv .venv
 
 # Windows
@@ -98,19 +109,21 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Install Python dependencies
+### 3. Install Python dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Create `.env` file
+> **Note:** `bcrypt==4.0.1` is pinned in requirements.txt due to a compatibility issue between passlib and bcrypt 4.x+.
+
+### 4. Create `.env` file
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and set a real secret key:
+Edit `.env` with your values:
 
 ```env
 SECRET_KEY=your-secret-key-min-32-characters
@@ -121,21 +134,11 @@ MODEL_PATH=backend/app/ml/models/text_classifier.joblib
 LABEL_MAPPING_PATH=backend/app/ml/models/label_mapping.json
 ```
 
-Generate a secure key with:
+Generate a secure `SECRET_KEY`:
 
 ```bash
 python -c "import secrets; print(secrets.token_hex(32))"
 ```
-
-### 4. Train the ML model (first-time setup)
-
-```bash
-# Place IMDB Dataset.csv in backend/app/ml/data/
-python -m backend.app.ml.src.preprocess
-python -m backend.app.ml.src.train
-```
-
-This produces `text_classifier.joblib` and `label_mapping.json` in `backend/app/ml/models/`.
 
 ### 5. Start the backend
 
@@ -143,8 +146,8 @@ This produces `text_classifier.joblib` and `label_mapping.json` in `backend/app/
 uvicorn backend.app.main:app --reload
 ```
 
-API runs at `http://127.0.0.1:8000`  
-Swagger docs at `http://127.0.0.1:8000/api/v1/docs`
+- API: `http://127.0.0.1:8000`
+- Swagger docs: `http://127.0.0.1:8000/api/v1/docs`
 
 ### 6. Start the frontend
 
@@ -154,37 +157,40 @@ npm install
 npm run dev
 ```
 
-Frontend runs at `http://localhost:5173`
+- Frontend: `http://localhost:5173`
 
 ---
 
 ## API Reference
 
+All protected endpoints require an `Authorization: Bearer <token>` header.
+
 ### Authentication
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/v1/auth/register` | Create a new account |
-| `POST` | `/api/v1/auth/login` | Login and receive JWT |
-| `GET` | `/api/v1/auth/me` | Get current user (auth required) |
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/v1/auth/register` | ❌ | Create a new account |
+| `POST` | `/api/v1/auth/login` | ❌ | Login and receive JWT |
+| `GET` | `/api/v1/auth/me` | ✅ | Get current user info |
 
 ### Predictions
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/v1/predict/` | Classify text (auth required) |
-| `GET` | `/api/v1/predict/history` | Get prediction history (auth required) |
-| `DELETE` | `/api/v1/predict/history/{id}` | Delete a prediction (auth required) |
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/v1/predict/` | ✅ | Classify text |
+| `GET` | `/api/v1/predict/history` | ✅ | Get prediction history |
+| `DELETE` | `/api/v1/predict/history/{id}` | ✅ | Delete a prediction |
 
 #### Example — classify text
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/predict/ \
-  -H "Authorization: Bearer <token>" \
+  -H "Authorization: Bearer <your_token>" \
   -H "Content-Type: application/json" \
   -d '{"text": "Scientists discover new clean energy source from seawater."}'
 ```
 
+**Response:**
 ```json
 {
   "prediction": "newsgroups_sci.med",
@@ -202,16 +208,37 @@ curl -X POST http://127.0.0.1:8000/api/v1/predict/ \
 
 ## ML Model
 
+The pre-trained model is included at `backend/app/ml/models/text_classifier.joblib` and loads automatically on server start.
+
 | Property | Value |
 |---|---|
 | Algorithm | TF-IDF + Logistic Regression |
-| Training data | IMDB (50k) + 20 Newsgroups (11k) |
-| Classes | 22 (2 sentiment + 20 news categories) |
+| Training data | IMDB (50k reviews) + 20 Newsgroups (11k articles) |
+| Total classes | 22 (2 sentiment + 20 news categories) |
 | Validation accuracy | ~89% |
 | Vocabulary size | 10,000 features |
-| n-gram range | (1, 2) unigrams + bigrams |
+| n-gram range | (1, 2) — unigrams + bigrams |
 
-Labels follow the format `source_classname` (e.g. `imdb_positive`, `newsgroups_rec.sport.hockey`).
+### Class Labels
+
+Labels follow the format `source_classname`:
+
+| Source | Labels |
+|---|---|
+| IMDB | `imdb_positive`, `imdb_negative` |
+| 20 Newsgroups | `newsgroups_rec.sport.hockey`, `newsgroups_sci.space`, `newsgroups_talk.politics.misc`, and 17 more |
+
+### Retraining (optional)
+
+If you want to retrain the model from scratch:
+
+```bash
+# Step 1 — preprocess (requires IMDB Dataset.csv in backend/app/ml/data/)
+python -m backend.app.ml.src.preprocess
+
+# Step 2 — train
+python -m backend.app.ml.src.train
+```
 
 ---
 
@@ -221,33 +248,36 @@ Labels follow the format `source_classname` (e.g. `imdb_positive`, `newsgroups_r
 python -m pytest backend/tests/ -v
 ```
 
-The test suite uses an isolated in-memory SQLite database — your production `app.db` is never touched.
+Tests run against an isolated SQLite database — production `app.db` is never touched.
 
-**Coverage — 24 tests:**
+**24 tests across 2 files:**
 
-- **Auth:** register (success, duplicate email/username, invalid inputs), login (success, wrong credentials), `/me` (valid token, no token, invalid token)
-- **Predict:** classify (success, unauthenticated, text too short/long/empty), history (empty, after prediction, pagination, user isolation), delete (success, not found, another user's record, unauthenticated)
+| File | What's tested |
+|---|---|
+| `test_auth.py` | Register (success, duplicate email/username, invalid inputs), Login (success, wrong credentials), `/me` (valid, no token, invalid token) |
+| `test_predict.py` | Classify (success, unauthenticated, text too short/long/empty), History (empty, after prediction, pagination, user isolation), Delete (success, not found, another user's record, unauthenticated) |
 
 ---
 
 ## Environment Variables
 
-| Variable | Description | Default |
+| Variable | Description | Required |
 |---|---|---|
-| `SECRET_KEY` | JWT signing key (min 32 chars) | **required** |
+| `SECRET_KEY` | JWT signing key (min 32 chars) | ✅ |
 | `ALGORITHM` | JWT algorithm | `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime | `1440` (24h) |
-| `DATABASE_URL` | SQLAlchemy connection string | SQLite path |
-| `MODEL_PATH` | Path to `.joblib` model file | see config |
-| `LABEL_MAPPING_PATH` | Path to `label_mapping.json` | see config |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime in minutes | `1440` |
+| `DATABASE_URL` | SQLAlchemy DB connection string | SQLite default |
+| `MODEL_PATH` | Path to `.joblib` model file | see config.py |
+| `LABEL_MAPPING_PATH` | Path to `label_mapping.json` | see config.py |
 
 ---
 
 ## Known Limitations
 
-- SQLite is used for simplicity — swap `DATABASE_URL` for PostgreSQL in production
-- `bcrypt==4.0.1` is required due to a passlib compatibility issue with bcrypt 4.x+
-- The ML model loads once at startup (singleton) — a server restart is needed to hot-swap the model
+- **SQLite** is used for simplicity — replace `DATABASE_URL` with a PostgreSQL URI for production
+- **bcrypt 4.0.1** is pinned — newer versions break passlib's version detection
+- **Model hot-swap** is not supported — a server restart is required to load a newly trained model
+- **CORS** is configured for `localhost` only — update `allow_origins` in `main.py` before deploying
 
 ---
 
