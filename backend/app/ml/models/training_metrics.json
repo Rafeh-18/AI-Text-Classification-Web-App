@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.8334562740758954,
+  "cross_val_score": 0.8019830961511341,
+  "train_samples": 48802,
+  "val_samples": 12201,
+  "num_classes": 22
+}
