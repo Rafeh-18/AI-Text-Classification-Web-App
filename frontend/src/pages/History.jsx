@@ -5,17 +5,17 @@ import Layout from '../components/Layout';
 import Card from '../components/ui/Card';
 import PredictionCard from '../components/PredictionCard';
 import Loading from '../components/ui/Loading';
-import { History as HistoryIcon, Trash2 } from 'lucide-react';
+import { History as HistoryIcon } from 'lucide-react'; // Fixed: removed unused `Trash2` import
 
 export default function History() {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
-  
+
   useEffect(() => {
     fetchHistory();
   }, []);
-  
+
   const fetchHistory = async () => {
     try {
       const response = await predictAPI.getHistory({ limit: 50, offset: 0 });
@@ -27,10 +27,10 @@ export default function History() {
       setLoading(false);
     }
   };
-  
+
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this prediction?')) return;
-    
+    if (!window.confirm('Are you sure you want to delete this prediction?')) return;
+
     try {
       await predictAPI.deletePrediction(id);
       setPredictions(prev => prev.filter(p => p.id !== id));
@@ -40,7 +40,7 @@ export default function History() {
       toast.error('Failed to delete prediction');
     }
   };
-  
+
   if (loading) {
     return (
       <Layout>
@@ -48,7 +48,7 @@ export default function History() {
       </Layout>
     );
   }
-  
+
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
@@ -63,7 +63,7 @@ export default function History() {
             <p className="text-sm text-gray-500">Total predictions</p>
           </div>
         </div>
-        
+
         {/* Predictions List */}
         {predictions.length === 0 ? (
           <Card className="text-center py-12">
@@ -74,8 +74,8 @@ export default function History() {
         ) : (
           <div className="grid gap-4">
             {predictions.map((prediction) => (
-              <PredictionCard 
-                key={prediction.id} 
+              <PredictionCard
+                key={prediction.id}
                 prediction={prediction}
                 onDelete={handleDelete}
               />

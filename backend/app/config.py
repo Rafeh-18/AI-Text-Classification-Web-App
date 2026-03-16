@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     API_V1_STR: str = "/api/v1"
     
-    SECRET_KEY: str = "your-super-secret-key-change-this-in-production-min-32-characters"
+    SECRET_KEY: str  # no default — forces it to be set in .env
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     

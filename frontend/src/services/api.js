@@ -8,13 +8,15 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Fixed: don't override if header already set (e.g. the me(token) call right after login)
+  if (!config.headers.Authorization) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -32,7 +34,14 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
-  getMe: () => api.get('/auth/me'),
+
+  // Fixed: renamed getMe → me to match usage in Login/Register.
+  // Accepts an optional token for the post-login call, before the token
+  // is stored in localStorage (so the interceptor can't attach it yet).
+  me: (token) => api.get('/auth/me', token
+    ? { headers: { Authorization: `Bearer ${token}` } }
+    : {}
+  ),
 };
 
 export const predictAPI = {

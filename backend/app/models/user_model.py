@@ -1,8 +1,10 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Float
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Float, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from backend.app.database.database import Base
-import hashlib
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class User(Base):
@@ -12,17 +14,19 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     username = Column(String(100), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    is_active = Column(Integer, default=1)
+    is_active = Column(Boolean, default=True)  # Fixed: was Integer
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     predictions = relationship("PredictionHistory", back_populates="user", cascade="all, delete-orphan")
     
     def set_password(self, password: str):
-        self.hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        # Fixed: was hashlib.sha256 — unsafe, no salt
+        self.hashed_password = pwd_context.hash(password)
     
     def verify_password(self, password: str) -> bool:
-        return self.hashed_password == hashlib.sha256(password.encode()).hexdigest()
+        # Fixed: was sha256 comparison
+        return pwd_context.verify(password, self.hashed_password)
 
 
 class PredictionHistory(Base):

@@ -19,54 +19,55 @@ export default function Register() {
     confirmPassword: '',
   });
   const [errors, setErrors] = useState({});
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: '' });
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrors({});
-    
-    // Validation
+
     if (formData.password !== formData.confirmPassword) {
       setErrors({ confirmPassword: 'Passwords do not match' });
       setLoading(false);
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setErrors({ password: 'Password must be at least 6 characters' });
       setLoading(false);
       return;
     }
-    
+
     try {
       const { confirmPassword, ...registerData } = formData;
-      const response = await authAPI.register(registerData);
-      
+      await authAPI.register(registerData);
+
       // Auto login after registration
       const loginResponse = await authAPI.login({
         email: formData.email,
         password: formData.password,
       });
-      
-      login(loginResponse.data.user, loginResponse.data.access_token);
+
+      // Fixed: /login returns no user object — fetch user separately via /auth/me
+      const meResponse = await authAPI.me(loginResponse.data.access_token);
+      login(meResponse.data, loginResponse.data.access_token);
       toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (error) {
       const message = error.response?.data?.detail || 'Registration failed';
-      setErrors({ email: message, username: message });
+      setErrors({ email: message });
       toast.error(message);
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-blue-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -77,7 +78,7 @@ export default function Register() {
           <h1 className="text-2xl font-bold text-gray-900">Create Account</h1>
           <p className="text-gray-600 mt-2">Get started with AI Text Classification</p>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Email"
@@ -89,7 +90,7 @@ export default function Register() {
             error={errors.email}
             required
           />
-          
+
           <Input
             label="Username"
             name="username"
@@ -100,7 +101,7 @@ export default function Register() {
             error={errors.username}
             required
           />
-          
+
           <Input
             label="Password"
             name="password"
@@ -111,7 +112,7 @@ export default function Register() {
             error={errors.password}
             required
           />
-          
+
           <Input
             label="Confirm Password"
             name="confirmPassword"
@@ -122,12 +123,12 @@ export default function Register() {
             error={errors.confirmPassword}
             required
           />
-          
+
           <Button type="submit" loading={loading} className="w-full">
             Create Account
           </Button>
         </form>
-        
+
         <p className="text-center mt-6 text-gray-600">
           Already have an account?{' '}
           <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
