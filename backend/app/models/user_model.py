@@ -16,15 +16,12 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Relationships
     predictions = relationship("PredictionHistory", back_populates="user", cascade="all, delete-orphan")
     
     def set_password(self, password: str):
-        """Hash and set password."""
         self.hashed_password = hashlib.sha256(password.encode()).hexdigest()
     
     def verify_password(self, password: str) -> bool:
-        """Verify password against hash."""
         return self.hashed_password == hashlib.sha256(password.encode()).hexdigest()
 
 
@@ -36,8 +33,7 @@ class PredictionHistory(Base):
     input_text = Column(Text, nullable=False)
     prediction = Column(String(255), nullable=False)
     confidence = Column(Float, nullable=False)
-    top_predictions = Column(Text)  # JSON string of top 3 predictions
+    top_predictions = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relationships
     user = relationship("User", back_populates="predictions")

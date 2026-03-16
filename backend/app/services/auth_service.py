@@ -9,23 +9,14 @@ from typing import Optional
 class AuthService:
     
     @staticmethod
-    def register(db: Session, user_data: UserCreate) -> Optional[User]:
-        """
-        Register a new user.
-        """
-        # Check if email exists
+    def register(db: Session, user_ UserCreate) -> User:
         if db.query(User).filter(User.email == user_data.email).first():
             raise ValueError("Email already registered")
         
-        # Check if username exists
         if db.query(User).filter(User.username == user_data.username).first():
             raise ValueError("Username already taken")
         
-        # Create user
-        user = User(
-            email=user_data.email,
-            username=user_data.username
-        )
+        user = User(email=user_data.email, username=user_data.username)
         user.set_password(user_data.password)
         
         try:
@@ -38,10 +29,7 @@ class AuthService:
             raise ValueError("Registration failed")
     
     @staticmethod
-    def login(db: Session, credentials: UserLogin) -> Optional[dict]:
-        """
-        Authenticate user and return tokens.
-        """
+    def login(db: Session, credentials: UserLogin) -> dict:
         user = db.query(User).filter(User.email == credentials.email).first()
         
         if not user or not user.verify_password(credentials.password):
@@ -50,7 +38,6 @@ class AuthService:
         if not user.is_active:
             raise ValueError("Account is deactivated")
         
-        # Generate token
         access_token = create_access_token(data={"sub": user.id})
         
         return {
@@ -61,14 +48,4 @@ class AuthService:
     
     @staticmethod
     def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
-        """
-        Get user by ID.
-        """
         return db.query(User).filter(User.id == user_id).first()
-    
-    @staticmethod
-    def get_user_by_email(db: Session, email: str) -> Optional[User]:
-        """
-        Get user by email.
-        """
-        return db.query(User).filter(User.email == email).first()

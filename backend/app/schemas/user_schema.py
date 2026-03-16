@@ -3,7 +3,6 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 
-# User Schemas
 class UserCreate(BaseModel):
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=100)
@@ -31,11 +30,6 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
-class TokenData(BaseModel):
-    user_id: Optional[int] = None
-
-
-# Prediction Schemas
 class PredictionRequest(BaseModel):
     text: str = Field(..., min_length=5, max_length=10000)
 
