@@ -14,7 +14,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:5173",
-        # Add your production frontend URL here, e.g. "https://your-frontend.com"
+        "http://localhost:8000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
