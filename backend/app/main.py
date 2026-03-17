@@ -8,7 +8,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
 
-# Fixed: allow_origins can't be ["*"] when allow_credentials=True — browsers will block it
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

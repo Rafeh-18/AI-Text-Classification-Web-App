@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     API_V1_STR: str = "/api/v1"
     
-    SECRET_KEY: str  # no default — forces it to be set in .env
+    SECRET_KEY: str  
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
     

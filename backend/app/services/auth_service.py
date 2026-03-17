@@ -38,8 +38,7 @@ class AuthService:
         if not user.is_active:
             raise ValueError("Account is deactivated")
 
-        # Fixed: sub must be a string — integer sub causes JWT encode/decode
-        # failures with some versions of python-jose
+
         access_token = create_access_token(data={"sub": str(user.id)})
 
         return {
